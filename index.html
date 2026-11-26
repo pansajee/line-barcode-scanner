@@ -147,23 +147,17 @@
       await stopScanner();
       renderLoading(cleanCode);
 
-      try {
-        const response = await fetch(GAS_WEB_APP_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            action: "scan_log",
-            barcode: cleanCode,
-            scanned_by: lineProfileName,
-            status: "สแกนตรวจสอบแล้ว"
-          })
-        });
+     try {
+      const url = new URL(GAS_WEB_APP_URL);
+      url.searchParams.set("action", "scan_log");
+      url.searchParams.set("barcode", cleanCode);
+      url.searchParams.set("scanned_by", lineProfileName);
+      url.searchParams.set("status", "สแกนตรวจสอบแล้ว");
 
-        const result = await response.json();
-        renderResult(cleanCode, result);
-      } catch (err) {
-        renderError(cleanCode, "เชื่อมต่อ Google Apps Script ไม่สำเร็จ: " + err.message);
-      }
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        redirect: "follow"
+      });
     }
 
     function renderLoading(code) {
